@@ -1,0 +1,26 @@
+name: CI/CD with Docker
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build_test_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ci-cd-demo:gha .
+
+      - name: Run tests in container
+        run: docker run --rm ci-cd-demo:gha node test.js
+
+      - name: CD demo - run container and curl it
+        run: |
+          docker run -d --name ci-cd-demo-running -p 3000:3000 ci-cd-demo:gha
+          sleep 2
+          curl -i http://localhost:3000
+          docker logs ci-cd-demo-running

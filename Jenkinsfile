@@ -2,9 +2,13 @@ pipeline {
   agent any
 
   stages {
-    stage('Test') {
+    stage('Test (Node in Docker)') {
       steps {
-        sh 'node test.js'
+        sh '''
+          docker run --rm \
+            -v "$PWD":/app -w /app \
+            node:20-alpine node test.js
+        '''
       }
     }
 
@@ -14,7 +18,7 @@ pipeline {
       }
     }
 
-    stage('Deploy (Run Container)') {
+    stage('Deploy') {
       steps {
         sh '''
           docker rm -f ci-cd-demo-running || true

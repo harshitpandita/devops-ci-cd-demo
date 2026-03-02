@@ -1,8 +1,30 @@
-name: CI/CD with Docker
+name: CI/CD Demo (Multiple Triggers)
 
 on:
+  # 1) Auto-run when you push to main
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+    # Optional: only run when these files change
+    paths:
+      - "**/*.js"
+      - "Dockerfile"
+      - "package.json"
+      - ".github/workflows/**"
+    # Also run when you push a tag like v1.0.0
+    tags:
+      - "v*"
+
+  # 2) Auto-run when a PR is opened/updated to main
+  pull_request:
+    branches: ["main"]
+
+  # 3) Manual trigger button on GitHub UI
+  workflow_dispatch:
+
+  # 4) Scheduled trigger (every day at 9:00 AM IST approx)
+  # GitHub schedule uses UTC. 9:00 AM IST = 3:30 AM UTC.
+  schedule:
+    - cron: "30 3 * * *"
 
 jobs:
   build_test_deploy:
@@ -15,10 +37,10 @@ jobs:
       - name: Build Docker image
         run: docker build -t ci-cd-demo:gha .
 
-      - name: Run tests in container
+      - name: Run tests inside container
         run: docker run --rm ci-cd-demo:gha node test.js
 
-      - name: CD demo - run container and curl it
+      - name: CD demo - run container and curl
         run: |
           docker run -d --name ci-cd-demo-running -p 3000:3000 ci-cd-demo:gha
           sleep 2

@@ -2,13 +2,9 @@ pipeline {
   agent any
 
   stages {
-    stage('Test (Node in Docker)') {
+    stage('Test') {
       steps {
-        sh '''
-          docker run --rm \
-            -v "$PWD":/app -w /app \
-            node:20-alpine node test.js
-        '''
+        sh 'node test.js'
       }
     }
 
